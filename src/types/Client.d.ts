@@ -12,11 +12,13 @@ export interface ClientConfig {
   observer?: (res: RequestResult, client: Client) => void
   keepAlive?: boolean
   headers?: { [key: string]: string | number }
-  fetch?: typeof fetch
+  fetch?: typeof fetch,
+  fetchOptions?: RequestInit
 }
 
 export interface QueryOptions {
-  secret?: string
+  secret?: string,
+  fetchOptions?: RequestInit
 }
 
 export default class Client {
