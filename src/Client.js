@@ -53,6 +53,8 @@ var parse = require('url-parse')
  *   Configures http/https keepAlive option (ignored in browser environments)
  * @param {?fetch} options.fetch
  *   a fetch compatible [API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) for making a request
+ * @param {?RequestInit} options.fetchOptions
+ *   Custom fetch options
  * @param {?number} options.queryTimeout
  *   Sets the maximum amount of time (in milliseconds) for query execution on the server,
  */
@@ -68,6 +70,7 @@ function Client(options) {
     keepAlive: true,
     headers: {},
     fetch: undefined,
+    fetchOptions: {},
     queryTimeout: null,
   })
   var isHttps = opts.scheme === 'https'
@@ -84,6 +87,7 @@ function Client(options) {
   this._headers = opts.headers
   this._fetch = opts.fetch || require('cross-fetch')
   this._queryTimeout = opts.queryTimeout
+  this._fetchOpts = opts.fetchOptions
 
   if (isNodeEnv && opts.keepAlive) {
     this._keepAliveEnabledAgent = new (isHttps
@@ -102,6 +106,7 @@ function Client(options) {
  * @param {?Object} options
  *   Object that configures the current query, overriding FaunaDB client options.
  * @param {?string} options.secret FaunaDB secret (see [Reference Documentation](https://app.fauna.com/documentation/intro/security))
+ * @param {?RequestInit} options.fetchOptions custom fetch options
  * @return {external:Promise<Object>} FaunaDB response object.
  */
 
@@ -231,6 +236,8 @@ Client.prototype._performRequest = function(
   }
 
   return this._fetch(url.href, {
+    ...this._fetchOpts.fetchOptions,
+    ...options.fetchOptions, // Query options should overwrite Client options
     agent: this._keepAliveEnabledAgent,
     body: body,
     headers: util.removeNullAndUndefinedValues({
