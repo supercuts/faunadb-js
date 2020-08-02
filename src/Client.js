@@ -236,7 +236,7 @@ Client.prototype._performRequest = function(
   }
 
   return this._fetch(url.href, {
-    ...this._fetchOpts.fetchOptions,
+    ...this._fetchOpts,
     ...options.fetchOptions, // Query options should overwrite Client options
     agent: this._keepAliveEnabledAgent,
     body: body,
